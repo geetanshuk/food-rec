@@ -8,7 +8,7 @@ const headers = {"Recommended For You": [],
 }
 
 const MyListItem = ({ item }) => (
-  <View style={{ padding: 10, borderBottomWidth: 1, borderColor: '#ccc', flexDirection: "row" }}>
+  <View style={{ padding: 5, borderColor: '#ccc', flexDirection: "row" }}>
     <Image 
       source={item.image}
       style={{ width: 150, height: 150 }}
@@ -25,9 +25,36 @@ const ConnectModel = () => {
     { id: '3', name: 'Item C', image: require('../assets/food_3.jpg') },
   ];
 
+  const data2 = [
+    { id: '1', name: 'Item A', image: require('../assets/food_1.jpg') },
+    { id: '2', name: 'Item B', image: require('../assets/food_2.jpg') },
+    { id: '3', name: 'Item C', image: require('../assets/food_3.jpg') },
+  ]
+
   return (
     <SafeAreaProvider>
     <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView horizontal={true} style={styles.scrollView}>
+        <View style = {styles.row}>
+          {data.map((item) => (
+            <MyListItem key={item.id} item={item} />
+          ))}
+        </View>
+      </ScrollView>
+      <ScrollView horizontal={true} style={styles.scrollView}>
+        <View style = {styles.row}>
+          {data.map((item) => (
+            <MyListItem key={item.id} item={item} />
+          ))}
+        </View>
+      </ScrollView>
+      <ScrollView horizontal={true} style={styles.scrollView}>
+        <View style = {styles.row}>
+          {data.map((item) => (
+            <MyListItem key={item.id} item={item} />
+          ))}
+        </View>
+      </ScrollView>
       <ScrollView horizontal={true} style={styles.scrollView}>
         <View style = {styles.row}>
           {data.map((item) => (
