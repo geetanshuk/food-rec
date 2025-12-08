@@ -52,6 +52,6 @@ for recipe in data:
     recipe["is_sweet"] = is_sweet(recipe["ingredients"])
 
 # Try resume from partially completed output
-with open("recipes_processed.json", "w", encoding="utf-8") as f:
+with open("datasets/recipes_processed.json", "w", encoding="utf-8") as f:
     json.dump(data, f, indent=2)
         
