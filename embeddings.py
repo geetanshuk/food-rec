@@ -31,19 +31,19 @@ INPUT_FILE = "datasets/recipes_processed.json"
 with open(INPUT_FILE, "r") as f:
     data = json.load(f)
 
-# recipe_texts = []
+recipe_texts = []
 
-# for recipe in data:
-#     recipe_ingredients = recipe["ingredients"]
-#     recipe_cuisine = "Cuisine: " + recipe["cuisine"]
-#     recipe_text = ", ".join(recipe_ingredients) + " | " + recipe_cuisine
-#     recipe_texts.append(recipe_text)
-#     # embedding = model.encode(recipe_text)
+for recipe in data:
+    recipe_ingredients = recipe["ingredients"]
+    recipe_cuisine = "Cuisine: " + recipe["cuisine"]
+    recipe_text = ", ".join(recipe_ingredients) + " | " + recipe_cuisine
+    recipe_texts.append(recipe_text)
+    # embedding = model.encode(recipe_text)
     
-# # Encode all recipes in batches (faster)
-# embeddings = model.encode(recipe_texts, batch_size=64, show_progress_bar=True, convert_to_tensor=True)
+# Encode all recipes in batches (faster)
+embeddings = model.encode(recipe_texts, batch_size=64, show_progress_bar=True, convert_to_tensor=True)
 
-# np.save("recipe_embeddings.npy", embeddings)
+np.save("recipe_embeddings.npy", embeddings)
 
 # loading the model that already compiled
 embeddings = np.load("recipe_embeddings.npy")
@@ -56,11 +56,11 @@ for recipe in data:
     recipe_ids.append(recipe["id"])
 
 # find cosine similarity between user embeddings and dataset
-# similarity_fn = SimilarityFunction.to_similarity_fn("cosine")
-# # recipe.ingredients correspond to embeddings
-# similarity_scores = list(zip(similarity_fn(embeddings, user_embedding), recipe_ids))
-# print(similarity_scores)
-# sorted_sim_scores = sorted(similarity_scores, reverse=True)
+similarity_fn = SimilarityFunction.to_similarity_fn("cosine")
+# recipe.ingredients correspond to embeddings
+similarity_scores = list(zip(similarity_fn(embeddings, user_embedding), recipe_ids))
+print(similarity_scores)
+sorted_sim_scores = sorted(similarity_scores, reverse=True)
 
 similarities = model.similarity(embeddings, user_embedding)
 
