@@ -98,14 +98,18 @@ export default function Preferences({user}) {
 
     const titles = selected.map(i => i.title);
 
-    const { error } = await supabase.from('Profiles').insert({
-      id: user.id,
-      name: 'Test',
-      preferences: titles,
-    });
+    const res = await fetch('https://localhost:8000/recommend', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: id,
+        name: 'Test',
+        preferences: titles,
+      })
+    })
 
-    if (error) console.error(error);
-    else Alert.alert("Saved!");
+    const data = await res.json();
+    console.log(data);
   };
 
 // ✅ If logged in → show ingredient screen
