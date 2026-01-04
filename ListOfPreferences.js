@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   FlatList,
   StatusBar,
@@ -8,56 +8,26 @@ import {
   Button,
   Alert,
   View,
+  Image,
 } from 'react-native';
 import supabase from './supa';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
-
+// 🔹 Sample ingredient data
 const DATA = [
-  {
-    id: '1a2b3c4d-0001-0000-0000-000000000001',
-    title: 'Apple',
-  },
-  {
-    id: '1a2b3c4d-0002-0000-0000-000000000002',
-    title: 'Banana',
-  },
-  {
-    id: '1a2b3c4d-0003-0000-0000-000000000003',
-    title: 'Bread',
-  },
-  {
-    id: '1a2b3c4d-0004-0000-0000-000000000004',
-    title: 'Rice',
-  },
-  {
-    id: '1a2b3c4d-0005-0000-0000-000000000005',
-    title: 'Eggs',
-  },
-  {
-    id: '1a2b3c4d-0006-0000-0000-000000000006',
-    title: 'Milk',
-  },
-  {
-    id: '1a2b3c4d-0007-0000-0000-000000000007',
-    title: 'Chicken',
-  },
-  {
-    id: '1a2b3c4d-0008-0000-0000-000000000008',
-    title: 'Carrot',
-  },
-  {
-    id: '1a2b3c4d-0009-0000-0000-000000000009',
-    title: 'Potato',
-  },
-  {
-    id: '1a2b3c4d-0010-0000-0000-000000000010',
-    title: 'Cheese',
-  },
-
-
+  { id: '1', title: 'Apple' },
+  { id: '2', title: 'Banana' },
+  { id: '3', title: 'Bread' },
+  { id: '4', title: 'Rice' },
+  { id: '5', title: 'Eggs' },
+  { id: '6', title: 'Milk' },
+  { id: '7', title: 'Chicken' },
+  { id: '8', title: 'Carrot' },
+  { id: '9', title: 'Potato' },
+  { id: '10', title: 'Cheese' },
 ];
 
+// 🔹 Item component for ingredient selection
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor }]}>
     <Text style={[styles.title, { color: textColor }]}>{item.title}</Text>
@@ -66,14 +36,26 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginTop: StatusBar.currentHeight || 0 },
-  item: { padding: 20, marginVertical: 8, marginHorizontal: 16 },
-  title: { fontSize: 32 },
-})
+  item: { padding: 20, marginVertical: 8, marginHorizontal: 16, borderRadius: 8 },
+  title: { fontSize: 20 },
+  recommendationCard: {
+    marginVertical: 8,
+    padding: 12,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+});
 
-export default function Preferences({user}) {
-    const [selected, setSelected] = useState([]);
+// 🔹 Main component
+export default function Preferences({ user, id }) {
+  const [selected, setSelected] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
-    const renderItem = ({ item }) => {
+  // 🔹 Toggle ingredient selection
+  const renderItem = ({ item }) => {
     const isSelected = selected.some(i => i.id === item.id);
 
     return (
@@ -81,9 +63,7 @@ export default function Preferences({user}) {
         item={item}
         onPress={() => {
           setSelected(prev =>
-            isSelected
-              ? prev.filter(i => i.id !== item.id)
-              : [...prev, item]
+            isSelected ? prev.filter(i => i.id !== item.id) : [...prev, item]
           );
         }}
         backgroundColor={isSelected ? '#6e3b6e' : '#f9c2ff'}
@@ -92,35 +72,54 @@ export default function Preferences({user}) {
     );
   };
 
-  // 🔹 Submit preferences
+  // 🔹 Submit preferences to API
   const submit = async () => {
     if (!user) return Alert.alert("You must be logged in");
-
+    console.log("Submitting preferences");
+    if (!selected || selected.length === 0) {
+      return Alert.alert("Please select at least one preference");
+    }
     const titles = selected.map(i => i.title);
 
-    const res = await fetch('https://localhost:8000/recommend', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: id,
-        name: 'Test',
-        preferences: titles,
-      })
-    })
+    console.log("Request body:", JSON.stringify({
+      id: id,
+      name: 'Test',
+      preferences: titles,
+    }));
 
-    const data = await res.json();
-    console.log(data);
+    try {
+      const res = await fetch('http://192.168.7.95:8000/recommend', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: id,
+          name: 'Test',
+          preferences: titles,
+        }),
+      });
+      console.log("Response received");
+      const data = await res.json();
+      console.log(data)
+      setRecommendations(data.top_recipes);
+
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error fetching recommendations");
+    }
   };
 
-// ✅ If logged in → show ingredient screen
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <Text style={{ margin: 10 }}>
-          Logged in as {user.email}
+        <Text style={{ fontSize: 18, margin: 10 }}>
+          Logged in as {user?.email || 'Guest'}
         </Text>
 
         <Button title="Log Out" onPress={() => supabase.auth.signOut()} />
+
+        <Text style={{ fontSize: 22, fontWeight: 'bold', marginVertical: 10 }}>
+          Select Ingredients
+        </Text>
 
         <FlatList
           data={DATA}
@@ -129,7 +128,36 @@ export default function Preferences({user}) {
           extraData={selected}
         />
 
-        <Button title="Submit" onPress={submit} />
+        <Button title="Get Recommendations" onPress={submit} />
+
+        {recommendations.length > 0 && (
+          <>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', marginVertical: 10 }}>
+              Recommendations
+            </Text>
+            <FlatList
+              data={recommendations}
+              keyExtractor={(item, index) => item.id || index.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.recommendationCard}>
+                  {item.image_url && (
+                    <Image
+                      source={{ uri: item.image_url }}
+                      style={{ width: '100%', height: 150, borderRadius: 10, marginBottom: 8 }}
+                      resizeMode="cover"
+                    />
+                  )}
+                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.recipe_title}</Text>
+                  {item.ingredients && (
+                    <Text style={{ marginTop: 4, color: '#555' }}>
+                      {item.ingredients.join(', ')}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+          </>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );

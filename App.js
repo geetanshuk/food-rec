@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import supabase from './supa';
 import SignInScreen from './loginScreen';
@@ -41,7 +41,7 @@ const App = () => {
     );
   } else {
     return (
-        <Preferences user = {user} />
+        <Preferences user = {user} id={user?.id} />
     );
   }
 
