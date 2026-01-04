@@ -29,6 +29,7 @@ def generate(user_embedding, recipe_embeddings, recipe_ids, top_n=10):
     top_recipes = [recipe_ids[i] for i in top_indices]
 
     # recipe id's to names
+    # need ingredients, directions, category, subcategory
     recipe_response = supabase.table("Recipes").select("id, recipe_title").in_("id", top_recipes).execute()
     recipe_data = recipe_response.data
 

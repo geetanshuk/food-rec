@@ -11,6 +11,7 @@ import {
   Image,
 } from 'react-native';
 import supabase from './supa';
+import PreferencePage from './showPrefs';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
 // 🔹 Sample ingredient data
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
 });
 
 // 🔹 Main component
-export default function Preferences({ user, id }) {
+export default function Preferences({ user, id, onRecommendations }) {
   const [selected, setSelected] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
 
@@ -100,7 +101,7 @@ export default function Preferences({ user, id }) {
       console.log("Response received");
       const data = await res.json();
       console.log(data)
-      setRecommendations(data.top_recipes);
+      onRecommendations(data.top_recipes)
 
     } catch (error) {
       console.error(error);
@@ -129,8 +130,11 @@ export default function Preferences({ user, id }) {
         />
 
         <Button title="Get Recommendations" onPress={submit} />
-
         {recommendations.length > 0 && (
+          <PreferencePage top_recipes={recommendations} />
+        )}
+
+        {/* {recommendations.length > 0 && (
           <>
             <Text style={{ fontSize: 22, fontWeight: 'bold', marginVertical: 10 }}>
               Recommendations
@@ -157,7 +161,7 @@ export default function Preferences({ user, id }) {
               )}
             />
           </>
-        )}
+        )} */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
