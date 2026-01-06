@@ -6,7 +6,7 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 
 import torch
 
-def generate(user_embedding, recipe_embeddings, recipe_ids, top_n=10):
+def generate(user_embedding, recipe_embeddings, recipe_ids, top_n=50):
     """
     user_embedding: torch.Tensor
     recipe_embeddings: list of torch.Tensor
@@ -30,7 +30,7 @@ def generate(user_embedding, recipe_embeddings, recipe_ids, top_n=10):
 
     # recipe id's to names
     # need ingredients, directions, category, subcategory
-    recipe_response = supabase.table("Recipes").select("id, recipe_title").in_("id", top_recipes).execute()
+    recipe_response = supabase.table("Recipes").select("id, recipe_title, ingredients, directions, category, subcategory").in_("id", top_recipes).execute()
     recipe_data = recipe_response.data
 
     return recipe_data
