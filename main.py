@@ -56,6 +56,7 @@ def recommend(body: UserRequest):
         embedding.append(torch.tensor(emb, dtype=torch.float32))
         recipe_ids.append(r)
     embedding_matrix = torch.stack(embedding)
+    print("embeddings matrix length", len(embedding_matrix))
 
     # compute user embedding
     user_embedding = model.encode(preferences, convert_to_tensor=True)
@@ -63,7 +64,5 @@ def recommend(body: UserRequest):
 
     # 4) compute cosine similarity
     fav = generate(user_embedding, embedding_matrix, recipe_ids)
-    # 5) pick top matches
-    print(fav)
     return {"top_recipes": fav}
 

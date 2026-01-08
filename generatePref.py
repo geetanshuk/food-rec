@@ -19,6 +19,7 @@ def generate(user_embedding, recipe_embeddings, recipe_ids, top_n=50):
     print(f"User embedding shape: {user_embedding.shape}")
     print(f"Recipe embeddings shape: {recipe_embeddings.shape}")
 
+
     # Cosine similarity
     similarities = torch.nn.functional.cosine_similarity(user_embedding, recipe_embeddings)
     
